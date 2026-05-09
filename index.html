@@ -117,6 +117,27 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .nt:focus{border-color:var(--accent);}
 .nm{font-size:10px;color:var(--text3);margin-top:6px;text-align:right;}
 
+/* BRIEFING TAB */
+.briefing-date{font-size:11px;color:var(--text3);margin-bottom:16px;}
+.briefing-card{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:16px;margin-bottom:8px;display:flex;gap:14px;align-items:flex-start;transition:border-color .2s;}
+.briefing-card:hover{border-color:rgba(255,255,255,.18);}
+.briefing-tag{font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+.tag-Chips{background:rgba(167,139,250,.15);color:var(--accent);}
+.tag-Cloud{background:rgba(94,234,212,.12);color:var(--teal);}
+.tag-Deal{background:rgba(52,211,153,.12);color:var(--green);}
+.tag-Infrastructure{background:rgba(251,191,36,.12);color:var(--yellow);}
+.tag-AI{background:rgba(167,139,250,.15);color:var(--accent);}
+.tag-Market{background:rgba(251,146,60,.12);color:var(--orange);}
+.tag-Earnings{background:rgba(52,211,153,.12);color:var(--green);}
+.briefing-body{}
+.briefing-headline{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.briefing-detail{font-size:12px;color:var(--text2);line-height:1.6;}
+.briefing-empty{text-align:center;padding:60px 20px;color:var(--text3);}
+.briefing-empty p{font-size:13px;margin-top:8px;}
+.briefing-loading{text-align:center;padding:40px;color:var(--text3);font-size:12px;}
+.briefing-refresh{background:none;border:1px solid var(--cb);color:var(--text2);font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;}
+.briefing-refresh:hover{background:var(--card);color:var(--text);}
+
 /* LEADS TAB */
 .leads-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .leads-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
@@ -179,6 +200,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <button class="tb" onclick="sw('projects',this)">Projects</button>
     <button class="tb" onclick="sw('revenue',this)">Revenue</button>
     <button class="tb" onclick="sw('leads',this)">Leads</button>
+    <button class="tb" onclick="sw('briefing',this)">Briefing</button>
     <button class="tb" onclick="sw('benson',this)">Benson</button>
     <button class="tb" onclick="sw('notes',this)">Notes</button>
   </div>
@@ -364,6 +386,21 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+<!-- BRIEFING -->
+<div id="tab-briefing" class="tc">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div class="welcome" style="margin-bottom:0;">
+      <h1>Daily Briefing</h1>
+      <p>AI stock news — pushed by Benson every morning at 8AM</p>
+    </div>
+    <button class="briefing-refresh" onclick="loadBriefing()">↻ Refresh</button>
+  </div>
+  <div id="briefing-date" class="briefing-date"></div>
+  <div id="briefing-container">
+    <div class="briefing-loading">Fetching briefing from GitHub...</div>
+  </div>
+</div>
+
 <!-- BENSON -->
 <div id="tab-benson" class="tc">
   <div class="welcome"><h1>Benson</h1><p>OpenClaw agent status and task queue</p></div>
@@ -470,6 +507,7 @@ function sw(name,btn){
   document.querySelectorAll('.tb').forEach(e=>e.classList.remove('on'));
   g('tab-'+name).classList.add('on');btn.classList.add('on');
   if(name==='leads')loadLeads();
+  if(name==='briefing')loadBriefing();
 }
 
 // MRR
@@ -673,9 +711,50 @@ function updateDashboardLeads(){
   if(sub)sub.textContent=allLeads.length+' total · '+newCount+' new';
 }
 
+// ── BRIEFING ───────────────────────────────────────────
+const BRIEFING_URL='https://raw.githubusercontent.com/davidlaskey66/mission-control/main/briefing.json';
+
+async function loadBriefing(){
+  const c=g('briefing-container');
+  const d=g('briefing-date');
+  if(c)c.innerHTML='<div class="briefing-loading">Fetching briefing from GitHub...</div>';
+  if(d)d.textContent='';
+  try{
+    const r=await fetch(BRIEFING_URL+'?t='+Date.now());
+    if(!r.ok)throw new Error('No briefing.json yet ('+r.status+')');
+    const data=await r.json();
+    if(d&&data.date){
+      const dt=new Date(data.date+'T12:00:00');
+      d.textContent='Last updated: '+dt.toLocaleDateString('en-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    }
+    const items=data.items||[];
+    if(!items.length){
+      c.innerHTML='<div class="briefing-empty"><div style="font-size:32px;">📰</div><p>No items in today\'s briefing.</p></div>';
+      return;
+    }
+    c.innerHTML=items.map(item=>`
+      <div class="briefing-card">
+        <span class="briefing-tag tag-${item.tag||'AI'}">${item.tag||'AI'}</span>
+        <div class="briefing-body">
+          <div class="briefing-headline">${item.headline}</div>
+          <div class="briefing-detail">${item.detail}</div>
+        </div>
+      </div>`).join('');
+  }catch(e){
+    if(c)c.innerHTML=`
+      <div class="briefing-empty">
+        <div style="font-size:32px;">📭</div>
+        <p style="color:var(--text2);font-weight:500;">No briefing file yet</p>
+        <p>Tell Benson to create <code style="background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;">briefing.json</code> in the mission-control repo after his 8AM run.</p>
+        <p style="margin-top:8px;font-size:11px;color:var(--text3);">${e.message}</p>
+      </div>`;
+  }
+}
+
 // Init
 rPri();rAct();rMRR();rTasks();
 loadLeads();
+loadBriefing();
 const mn=g('n-main');if(mn)mn.value=s.notes.main||'';
 const ni=g('n-ideas');if(ni)ni.value=s.notes.ideas||'';
 </script>
