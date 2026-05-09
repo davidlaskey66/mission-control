@@ -132,6 +132,8 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .briefing-body{}
 .briefing-headline{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
 .briefing-detail{font-size:12px;color:var(--text2);line-height:1.6;}
+.dismiss-btn{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:2px 4px;line-height:1;border-radius:4px;flex-shrink:0;transition:color .15s;}
+.dismiss-btn:hover{color:#ef4444;}
 .briefing-empty{text-align:center;padding:60px 20px;color:var(--text3);}
 .briefing-empty p{font-size:13px;margin-top:8px;}
 .briefing-loading{text-align:center;padding:40px;color:var(--text3);font-size:12px;}
@@ -630,6 +632,7 @@ async function loadLeads(){
     if(!r.ok)throw new Error('No leads.json yet ('+r.status+')');
     const data=await r.json();
     allLeads=data.leads||[];
+    allLeads=allLeads.filter(l=>!(s.dismissedLeads||[]).includes(String(l.id)));
     renderLeads();
     updateLeadStats();
     updateDashboardLeads();
@@ -682,7 +685,7 @@ function leadCard(l){
   const sc=l.score>=5?'score-5':l.score>=4?'score-4':'score-3';
   const st='status-'+(l.status||'new');
   const stLabel=(l.status||'new').charAt(0).toUpperCase()+(l.status||'new').slice(1);
-  return `<div class="lead-card">
+  return `<div class="lead-card" id="lead-${l.id}">
     <div class="lead-score ${sc}">${l.score}</div>
     <div class="lead-body">
       <div class="lead-title"><a href="${l.url}" target="_blank" rel="noopener">${l.thread_title}</a></div>
@@ -692,8 +695,18 @@ function leadCard(l){
     <div class="lead-actions">
       <span class="lead-status ${st}">${stLabel}</span>
       <span class="lead-date">Score ${l.score}/5</span>
+      <button class="dismiss-btn" onclick="dismissLead('${l.id}')" title="Dismiss lead">✕</button>
     </div>
   </div>`;
+}
+
+function dismissLead(id){
+  if(!confirm('Dismiss this lead? It will be hidden until Benson removes it from the file.'))return;
+  s.dismissedLeads=s.dismissedLeads||[];
+  if(!s.dismissedLeads.includes(id))s.dismissedLeads.push(id);
+  sv();
+  const el=document.getElementById('lead-'+id);
+  if(el){el.style.transition='opacity .3s';el.style.opacity='0';setTimeout(()=>{el.remove();updateLeadStats();updateDashboardLeads();},300);}
 }
 
 function updateLeadStats(){
@@ -727,18 +740,19 @@ async function loadBriefing(){
       const dt=new Date(data.date+'T12:00:00');
       d.textContent='Last updated: '+dt.toLocaleDateString('en-CA',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
     }
-    const items=data.items||[];
+    const items=(data.items||[]).filter(item=>!(s.dismissedBriefing||[]).includes(item.headline));
     if(!items.length){
       c.innerHTML='<div class="briefing-empty"><div style="font-size:32px;">📰</div><p>No items in today\'s briefing.</p></div>';
       return;
     }
     c.innerHTML=items.map(item=>`
-      <div class="briefing-card">
+      <div class="briefing-card" id="brief-${btoa(item.headline).replace(/=/g,'')}">
         <span class="briefing-tag tag-${item.tag||'AI'}">${item.tag||'AI'}</span>
         <div class="briefing-body">
           <div class="briefing-headline">${item.headline}</div>
           <div class="briefing-detail">${item.detail}</div>
         </div>
+        <button class="dismiss-btn" onclick="dismissBriefing('${item.headline.replace(/'/g,"\\'")}',this)" title="Dismiss">✕</button>
       </div>`).join('');
   }catch(e){
     if(c)c.innerHTML=`
@@ -749,6 +763,15 @@ async function loadBriefing(){
         <p style="margin-top:8px;font-size:11px;color:var(--text3);">${e.message}</p>
       </div>`;
   }
+}
+
+function dismissBriefing(headline,btn){
+  if(!confirm('Dismiss this item? It will stay hidden until Benson pushes a new briefing.'))return;
+  s.dismissedBriefing=s.dismissedBriefing||[];
+  if(!s.dismissedBriefing.includes(headline))s.dismissedBriefing.push(headline);
+  sv();
+  const card=btn.closest('.briefing-card');
+  if(card){card.style.transition='opacity .3s';card.style.opacity='0';setTimeout(()=>card.remove(),300);}
 }
 
 // Init
