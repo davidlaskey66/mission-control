@@ -1,0 +1,64 @@
+{
+  "leads": [
+    {
+      "id": "1",
+      "product": "Claimr",
+      "subreddit": "r/smallbusiness",
+      "thread_title": "Best simple app for receipt tracking (Canada-specific)",
+      "url": "https://old.reddit.com/r/smallbusiness/comments/11mqk9_best_simple_app_for_receipt_tracking/",
+      "score": 5,
+      "status": "new",
+      "notes": "Spouse of trades worker, HST tracking, Canada-specific. Highest priority.",
+      "date_found": "2026-05-08",
+      "date_responded": null
+    },
+    {
+      "on_line_id": "2",
+      "product": "BillFlow",
+      "subreddit": "r/povertyfinance",
+      "thread_title": "I'm looking for an app or way to easily keep track of bills",
+      "url": "https://old.reddit.com/r/povertyfinance/comments/lqi_im/im_looking_for_an_app_or_way_to_keep_track_of_bills/",
+      "score": 4,
+      "status": "new",
+      "notes": "User is explicitly searching for an app to track monthly recurring bills to avoid surprises.",
+      "date_found": "2026-05-08",
+      "date_responded": null
+    },
+    {
+      "id": "3",
+      "product": "BillFlow",
+      "subreddit": "r/povertyfinance",
+      "thread_title": "How can I budget effectively on a limited income?",
+      "url": "https://old.reddit.com/r/povertyfinance/comments/6987is/how_can_i_budget_effectively_on_a_limited_income_without_monthly_bills_im_in_canada_planning_for_after_my_parents_pass_away/",
+      "score": 3,
+      "status": "new",
+      "notes": "Focused on long-term cash flow planning and managing future financial unpredictability within Canada.",
+      "date_found": "2026-05-08",
+      "date_responded": null
+    },
+    {
+      "id": "4",
+      "product": "Claimr",
+      "subreddit": "r/smallbusiness",
+      "thread_title": "Receipt tracking app for a small farming business",
+      "url": "https://old.reddit.com/r/smallbusiness/comments/1d9iv0j/receipt_tracking_app/",
+      "score": 5,
+      "status": "new",
+      "notes": "Canadian business owner needs simple receipt capture and bank linking without the complexity of QuickBooks.",
+      "date_found": "2026-05-08",
+      "date_responded": null
+    },
+    {
+      "id": "5",
+      "product": "Claimr",
+      "subreddit": "r/smallbusiness",
+      "thread_title": "How do businesses in Canada keep track of taxes and filings?",
+      "url": "https://old.reddit.com/r/smallbusiness/comments/16x0vmo/some_questions_about_contract_work_and_small_business_expenses_in_canada/",
+      "score": 4,
+      "status": "new",
+      "notes": "Looking for tools to manage the administrative burden of Canadian business compliance and expense tracking.",
+      "date_found": "2026-05-08",
+      "date_responded": null
+    }
+  ]
+}
