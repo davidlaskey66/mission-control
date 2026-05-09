@@ -116,13 +116,54 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .nt{width:100%;min-height:380px;background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:14px;color:var(--text);font-family:'Inter',sans-serif;font-size:12px;line-height:1.7;resize:vertical;outline:none;}
 .nt:focus{border-color:var(--accent);}
 .nm{font-size:10px;color:var(--text3);margin-top:6px;text-align:right;}
+
+/* LEADS TAB */
+.leads-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.leads-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.lstat{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:12px 14px;}
+.lstat-val{font-size:22px;font-weight:600;letter-spacing:-.03em;}
+.lstat-lbl{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);margin-top:3px;}
+.leads-group{margin-bottom:24px;}
+.leads-group-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.leads-group-title span{width:6px;height:6px;border-radius:50%;display:inline-block;}
+.bf-dot{background:var(--accent);}
+.cl-dot{background:var(--teal);}
+.lead-card{background:var(--card);border:1px solid var(--cb);border-radius:var(--r);padding:14px;margin-bottom:8px;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;transition:border-color .2s;}
+.lead-card:hover{border-color:rgba(255,255,255,.2);}
+.lead-score{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;flex-shrink:0;}
+.score-5{background:rgba(52,211,153,.15);color:var(--green);}
+.score-4{background:rgba(167,139,250,.15);color:var(--accent);}
+.score-3{background:rgba(255,255,255,.07);color:var(--text2);}
+.lead-body{}
+.lead-title{font-size:13px;font-weight:500;color:var(--text);margin-bottom:3px;line-height:1.4;}
+.lead-title a{color:inherit;text-decoration:none;}
+.lead-title a:hover{color:var(--accent);}
+.lead-meta{font-size:11px;color:var(--text3);margin-bottom:5px;}
+.lead-notes{font-size:11px;color:var(--text2);line-height:1.5;}
+.lead-actions{display:flex;flex-direction:column;gap:5px;align-items:flex-end;flex-shrink:0;}
+.lead-status{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500;white-space:nowrap;}
+.status-new{background:rgba(251,191,36,.12);color:var(--yellow);}
+.status-drafted{background:rgba(167,139,250,.15);color:var(--accent);}
+.status-posted{background:rgba(52,211,153,.12);color:var(--green);}
+.status-closed{background:rgba(255,255,255,.06);color:var(--text3);}
+.lead-date{font-size:10px;color:var(--text3);}
+.leads-empty{text-align:center;padding:60px 20px;color:var(--text3);}
+.leads-empty p{font-size:13px;margin-top:8px;}
+.leads-loading{text-align:center;padding:40px;color:var(--text3);font-size:12px;}
+.leads-refresh{background:none;border:1px solid var(--cb);color:var(--text2);font-family:'Inter',sans-serif;font-size:11px;padding:4px 10px;border-radius:5px;cursor:pointer;}
+.leads-refresh:hover{background:var(--card);color:var(--text);}
+.leads-filter{display:flex;gap:6px;}
+.lf{background:none;border:1px solid var(--cb);color:var(--text3);font-family:'Inter',sans-serif;font-size:11px;padding:3px 10px;border-radius:20px;cursor:pointer;}
+.lf:hover,.lf.on{background:var(--card);color:var(--text);border-color:rgba(255,255,255,.2);}
+
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:2px;}
 @media(max-width:800px){
-  .mg,.pg3,.rs,.bg,.nw{grid-template-columns:1fr!important;}
+  .mg,.pg3,.rs,.bg,.nw,.leads-stats{grid-template-columns:1fr!important;}
   .twocol{grid-template-columns:1fr;}
-  .tabs .tb:nth-child(n+4){display:none;}
+  .tabs .tb:nth-child(n+5){display:none;}
+  .lead-card{grid-template-columns:auto 1fr;}.lead-actions{flex-direction:row;grid-column:1/-1;}
 }
 </style>
 </head>
@@ -137,6 +178,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
     <button class="tb on" onclick="sw('dashboard',this)">Dashboard</button>
     <button class="tb" onclick="sw('projects',this)">Projects</button>
     <button class="tb" onclick="sw('revenue',this)">Revenue</button>
+    <button class="tb" onclick="sw('leads',this)">Leads</button>
     <button class="tb" onclick="sw('benson',this)">Benson</button>
     <button class="tb" onclick="sw('notes',this)">Notes</button>
   </div>
@@ -171,10 +213,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="mt tne">Stay the course</div>
     </div>
     <div class="mc gr">
-      <div class="mlb">Benson</div>
-      <div class="mv" style="font-size:18px;padding-top:4px;">Online</div>
-      <div class="ms">Gemma 4 26B · 48GB GPU</div>
-      <div class="mt tup">● 8AM briefing active</div>
+      <div class="mlb">Open Leads</div>
+      <div class="mv" id="m-leads">—</div>
+      <div class="ms" id="m-leads-sub">Loading...</div>
+      <div class="mt tup">Benson-sourced</div>
     </div>
   </div>
   <div class="twocol">
@@ -280,6 +322,48 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
 </div>
 
+<!-- LEADS -->
+<div id="tab-leads" class="tc">
+  <div class="leads-header">
+    <div class="welcome" style="margin-bottom:0;">
+      <h1>Leads</h1>
+      <p>Reddit prospects sourced by Benson — updated on push</p>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="leads-filter">
+        <button class="lf on" onclick="filterLeads('all',this)">All</button>
+        <button class="lf" onclick="filterLeads('new',this)">New</button>
+        <button class="lf" onclick="filterLeads('drafted',this)">Drafted</button>
+        <button class="lf" onclick="filterLeads('posted',this)">Posted</button>
+      </div>
+      <button class="leads-refresh" onclick="loadLeads()">↻ Refresh</button>
+    </div>
+  </div>
+
+  <div class="leads-stats">
+    <div class="lstat">
+      <div class="lstat-val" id="ls-total">—</div>
+      <div class="lstat-lbl">Total Leads</div>
+    </div>
+    <div class="lstat">
+      <div class="lstat-val" style="color:var(--yellow);" id="ls-new">—</div>
+      <div class="lstat-lbl">New</div>
+    </div>
+    <div class="lstat">
+      <div class="lstat-val" style="color:var(--accent);" id="ls-bf">—</div>
+      <div class="lstat-lbl">BillFlow</div>
+    </div>
+    <div class="lstat">
+      <div class="lstat-val" style="color:var(--teal);" id="ls-cl">—</div>
+      <div class="lstat-lbl">Claimr</div>
+    </div>
+  </div>
+
+  <div id="leads-container">
+    <div class="leads-loading">Loading leads from GitHub...</div>
+  </div>
+</div>
+
 <!-- BENSON -->
 <div id="tab-benson" class="tc">
   <div class="welcome"><h1>Benson</h1><p>OpenClaw agent status and task queue</p></div>
@@ -313,7 +397,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="ci"><span class="cn">MEMORY.md Curation</span><span class="ct">Wed & Sun 5AM</span><span class="cb2 bpe">Setup needed</span></div>
       <div class="ci"><span class="cn">Claimr Reddit Monitor</span><span class="ct">Daily</span><span class="cb2 bpe">Setup needed</span></div>
       <div class="ci"><span class="cn">BillFlow Lead Gen</span><span class="ct">Daily</span><span class="cb2 bpe">Setup needed</span></div>
-      <div class="ci"><span class="cn">Mission Control Sync</span><span class="ct">On update</span><span class="cb2 bpe">Setup needed</span></div>
+      <div class="ci"><span class="cn">Mission Control Sync</span><span class="ct">On push</span><span class="cb2 bac">Active</span></div>
     </div>
     <div class="sc" style="grid-column:1/-1;">
       <div class="sh">
@@ -348,6 +432,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script>
 const K='ttb_mc_v2';const G=10000;
+const LEADS_URL='https://raw.githubusercontent.com/davidlaskey66/mission-control/main/leads.json';
 const D={mrr:{billflow:0,claimr:0,other:0},pri:[
   {id:1,text:'Add Stripe monetization to BillFlow',done:false,tag:'now'},
   {id:2,text:'Move Claimr to Vercel + email waitlist',done:false,tag:'now'},
@@ -384,6 +469,7 @@ function sw(name,btn){
   document.querySelectorAll('.tc').forEach(e=>e.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(e=>e.classList.remove('on'));
   g('tab-'+name).classList.add('on');btn.classList.add('on');
+  if(name==='leads')loadLeads();
 }
 
 // MRR
@@ -494,8 +580,102 @@ function sn(k,v){
   if(el)el.textContent='Saved '+n.toLocaleTimeString('en-CA',{hour:'2-digit',minute:'2-digit'});
 }
 
+// ── LEADS ──────────────────────────────────────────────
+let allLeads=[];
+let activeFilter='all';
+
+async function loadLeads(){
+  const c=g('leads-container');
+  if(c)c.innerHTML='<div class="leads-loading">Fetching leads from GitHub...</div>';
+  try{
+    const r=await fetch(LEADS_URL+'?t='+Date.now());
+    if(!r.ok)throw new Error('No leads.json yet ('+r.status+')');
+    const data=await r.json();
+    allLeads=data.leads||[];
+    renderLeads();
+    updateLeadStats();
+    updateDashboardLeads();
+  }catch(e){
+    if(c)c.innerHTML=`
+      <div class="leads-empty">
+        <div style="font-size:32px;">📭</div>
+        <p style="color:var(--text2);font-weight:500;">No leads file yet</p>
+        <p>Tell Benson to create <code style="background:rgba(255,255,255,.07);padding:2px 6px;border-radius:4px;">leads.json</code> in the mission-control repo and push it.</p>
+        <p style="margin-top:8px;font-size:11px;color:var(--text3);">${e.message}</p>
+      </div>`;
+  }
+}
+
+function filterLeads(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.lf').forEach(b=>b.classList.remove('on'));
+  if(btn)btn.classList.add('on');
+  renderLeads();
+}
+
+function renderLeads(){
+  const c=g('leads-container');if(!c)return;
+  if(!allLeads.length){
+    c.innerHTML='<div class="leads-empty"><div style="font-size:32px;">📭</div><p>No leads found in file.</p></div>';
+    return;
+  }
+  const filtered=activeFilter==='all'?allLeads:allLeads.filter(l=>l.status===activeFilter);
+  const bf=filtered.filter(l=>l.product==='BillFlow');
+  const cl=filtered.filter(l=>l.product==='Claimr');
+
+  let html='';
+  if(bf.length){
+    html+=`<div class="leads-group">
+      <div class="leads-group-title"><span class="bf-dot"></span>BillFlow — ${bf.length} lead${bf.length!==1?'s':''}</div>
+      ${bf.sort((a,b)=>b.score-a.score).map(leadCard).join('')}
+    </div>`;
+  }
+  if(cl.length){
+    html+=`<div class="leads-group">
+      <div class="leads-group-title"><span class="cl-dot"></span>Claimr — ${cl.length} lead${cl.length!==1?'s':''}</div>
+      ${cl.sort((a,b)=>b.score-a.score).map(leadCard).join('')}
+    </div>`;
+  }
+  if(!html)html='<div class="leads-empty"><div style="font-size:32px;">🔍</div><p>No leads match this filter.</p></div>';
+  c.innerHTML=html;
+}
+
+function leadCard(l){
+  const sc=l.score>=5?'score-5':l.score>=4?'score-4':'score-3';
+  const st='status-'+(l.status||'new');
+  const stLabel=(l.status||'new').charAt(0).toUpperCase()+(l.status||'new').slice(1);
+  return `<div class="lead-card">
+    <div class="lead-score ${sc}">${l.score}</div>
+    <div class="lead-body">
+      <div class="lead-title"><a href="${l.url}" target="_blank" rel="noopener">${l.thread_title}</a></div>
+      <div class="lead-meta">${l.subreddit} · Found ${l.date_found||'—'}${l.date_responded?' · Responded '+l.date_responded:''}</div>
+      ${l.notes?`<div class="lead-notes">${l.notes}</div>`:''}
+    </div>
+    <div class="lead-actions">
+      <span class="lead-status ${st}">${stLabel}</span>
+      <span class="lead-date">Score ${l.score}/5</span>
+    </div>
+  </div>`;
+}
+
+function updateLeadStats(){
+  const set=(id,v)=>{const el=g(id);if(el)el.textContent=v;};
+  set('ls-total',allLeads.length);
+  set('ls-new',allLeads.filter(l=>l.status==='new').length);
+  set('ls-bf',allLeads.filter(l=>l.product==='BillFlow').length);
+  set('ls-cl',allLeads.filter(l=>l.product==='Claimr').length);
+}
+
+function updateDashboardLeads(){
+  const newCount=allLeads.filter(l=>l.status==='new').length;
+  const el=g('m-leads');const sub=g('m-leads-sub');
+  if(el)el.textContent=newCount;
+  if(sub)sub.textContent=allLeads.length+' total · '+newCount+' new';
+}
+
 // Init
 rPri();rAct();rMRR();rTasks();
+loadLeads();
 const mn=g('n-main');if(mn)mn.value=s.notes.main||'';
 const ni=g('n-ideas');if(ni)ni.value=s.notes.ideas||'';
 </script>
